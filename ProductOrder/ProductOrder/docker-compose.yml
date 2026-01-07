@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  productservice:
+    build:
+      context: .
+      dockerfile: ProductService/Dockerfile
+    container_name: productservice
+    ports:
+      - "5001:80"        # Host 5001 -> container 80
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    restart: unless-stopped
+
+  orderservice:
+    build:
+      context: .
+      dockerfile: OrderService/Dockerfile
+    container_name: orderservice
+    ports:
+      - "5002:80"        # Host 5002 -> container 80
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - productservice
+    restart: unless-stopped
+
+  apigateway:
+    build:
+      context: .
+      dockerfile: ApiGateway/Dockerfile
+    container_name: apigateway
+    ports:
+      - "5000:80"        # Host 5000 -> container 80
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - productservice
+      - orderservice
+    restart: unless-stopped
